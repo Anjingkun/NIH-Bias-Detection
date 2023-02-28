@@ -38,7 +38,7 @@ class BiasRemoverModel:
                 {
                     "feature_name": dataset.protected_attribute_names[i],
                     "privileged_value": dataset.privileged_protected_attributes[i][0],
-                    "level": 1,  # we can change this level，but this level must be integar
+                    "level": 1,  # we can change this level，but this level must be positive integar
                 }
             )
             unprivileged_groups.append(
@@ -47,7 +47,7 @@ class BiasRemoverModel:
                     "unprivileged_value": dataset.unprivileged_protected_attributes[i][
                         0
                     ],
-                    "level": 1,  # we can change this level，but this level must be integar
+                    "level": 1,  # we can change this level，but this level must be positive integar
                 }
             )
         rw = MultiLevelReweighing(unprivileged_groups, privileged_groups)
