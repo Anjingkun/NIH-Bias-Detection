@@ -18,3 +18,5 @@ conda create -n befair python=3.9
 conda activate befair
 pip install -r requirements.txt
 ```
+
+Please make sure you have correctly installed aif360 package. If not, please install it manually. (AIF360 GitHub repository reference: https://github.com/Trusted-AI/AIF360)
