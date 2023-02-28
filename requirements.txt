@@ -1,4 +1,6 @@
-aif360
+tensorflow
+torch
 numpy
 pandas
 scikit-learn
+aif360[all]
