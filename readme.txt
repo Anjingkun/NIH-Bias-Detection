@@ -7,12 +7,14 @@
 
 Linux/Windows/MacOS with Python version >= 3.8
 
+(We've tested on Ubuntu 18 and Debian 11)
+
 (Optional) Create a virtual environment
 
 - Install with pip
 
 ```
-conda create --name befair python=3.9
+conda create -n befair python=3.9
 conda activate befair
 pip install -r requirements.txt
 ```
