@@ -1,56 +1,67 @@
 # Scalers
-from sklearn.preprocessing import StandardScaler
+import numpy as np
+from aif360.algorithms import Transformer
+from aif360.metrics import utils
 
 # Classifiers
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
-import numpy as np
-
-from aif360.algorithms import Transformer
-from aif360.metrics import utils
+from sklearn.preprocessing import StandardScaler
 
 
 class BiasRemoverModel:
-    '''
-        BiasRemoverModel is a model that can be trained by a dataset.Before using this model ,
-        the dataset will be reweighted by MultiLevelReweighing. After reweighing the dataset, 
-        we can train the model.
-    '''
+    """
+    BiasRemoverModel is a model that can be trained by a dataset.Before using this model ,
+    the dataset will be reweighted by MultiLevelReweighing. After reweighing the dataset,
+    we can train the model.
+    """
+
     def __init__(self):
         self.lr_model = make_pipeline(
             StandardScaler(), LogisticRegression(solver="liblinear", random_state=1)
         )
-        
-        
-    '''
+
+    """
         This function can train the model.
         Args:
             dataset (BinaryLabelDataset): Dataset containing true labels.
         Return:
             BiasRemoverModel (self)
-    '''
+    """
+
     def fit(self, dataset):
-        privileged_groups=[]
-        unprivileged_groups=[]
+        privileged_groups = []
+        unprivileged_groups = []
         for i in range(len(dataset.privileged_protected_attributes)):
-            privileged_groups.append({
-                'feature_name':dataset.protected_attribute_names[i],
-                'privileged_value':dataset.privileged_protected_attributes[i][0],
-                'level':1                           #we can change this level
-            })
-            unprivileged_groups.append({
-                'feature_name':dataset.protected_attribute_names[i],
-                'unprivileged_value':dataset.unprivileged_protected_attributes[i][0],
-                'level':1                           #we can change this level
-            })
-        rw = MultiLevelReweighing(unprivileged_groups,privileged_groups)
+            privileged_groups.append(
+                {
+                    "feature_name": dataset.protected_attribute_names[i],
+                    "privileged_value": dataset.privileged_protected_attributes[i][0],
+                    "level": 1,  # we can change this level
+                }
+            )
+            unprivileged_groups.append(
+                {
+                    "feature_name": dataset.protected_attribute_names[i],
+                    "unprivileged_value": dataset.unprivileged_protected_attributes[i][
+                        0
+                    ],
+                    "level": 1,  # we can change this level
+                }
+            )
+        rw = MultiLevelReweighing(unprivileged_groups, privileged_groups)
         trans_dataset = rw.fit_transform(dataset)
-        fit_params = {'logisticregression__sample_weight': trans_dataset.instance_weights}
-        lr_trans_dataset_model = self.lr_model.fit(dataset.features, dataset.labels.ravel(), **fit_params)
-        self.lr_model=lr_trans_dataset_model
+        fit_params = {
+            "logisticregression__sample_weight": trans_dataset.instance_weights
+        }
+        lr_trans_dataset_model = self.lr_model.fit(
+            dataset.features, dataset.labels.ravel(), **fit_params
+        )
+        self.lr_model = lr_trans_dataset_model
         return self
-    '''
+
+    """
         This function can output the Probability of prediction
         Args:
             features (numpy):ths features of samples.
@@ -60,17 +71,16 @@ class BiasRemoverModel:
             ]
         Return :
             the Probability of prediction
-    '''
-    def predic_prob(self,features):
+    """
+
+    def predic_prob(self, features):
         return self.lr_model.predict_proba(features)
-        
-        
 
 
 class MultiLevelReweighing(Transformer):
     """MultiLevelReweighing is a preprocessing technique that Weights the examples in each
     (group, label) combination differently to ensure fairness before
-    classification .This technique can compute the protected level of every sample , and then it can 
+    classification .This technique can compute the protected level of every sample , and then it can
     give every sample a new weight.
     """
 
@@ -111,13 +121,13 @@ class MultiLevelReweighing(Transformer):
             unfav_cond,
             combination_p_fav_dic,
         ) = self._obtain_conditionings(dataset)
-    
+
         level_max = 0
         for group in self.privileged_groups:
             level_max = level_max + group["level"]
         n = np.sum(dataset.instance_weights, dtype=np.float64)
         n_p_level_dic = {}
-        #weight:[1,2,1,1,2]
+        # weight:[1,2,1,1,2]
         #'n_p1':2
         for level in range(0, level_max + 1):
             n_p_level_dic["n_p" + str(level)] = np.sum(
@@ -131,7 +141,7 @@ class MultiLevelReweighing(Transformer):
         n_unfav = np.sum(dataset.instance_weights[unfav_cond], dtype=np.float64)
 
         n_p_level_fav_or_unfav_dic = {}
-        #"n_p1_unfav":3
+        # "n_p1_unfav":3
         for level in range(0, level_max + 1):
             n_p_level_fav_or_unfav_dic["n_p" + str(level) + "_fav"] = np.sum(
                 dataset.instance_weights[
@@ -149,8 +159,8 @@ class MultiLevelReweighing(Transformer):
         self.w_p_level_fav_or_unfav_dic = {}
 
         # reweighing weights
-        #dataset.instance_weights
-        #"w_p3_fav":3
+        # dataset.instance_weights
+        # "w_p3_fav":3
         for level in range(0, level_max + 1):
             self.w_p_level_fav_or_unfav_dic["w_p" + str(level) + "_fav"] = (
                 n_fav
@@ -227,7 +237,7 @@ class MultiLevelReweighing(Transformer):
         #     [0,0]
         # ]
         # ['sex','race']
-        for sample_index in range(len(dataset.protected_attributes)):#3,5
+        for sample_index in range(len(dataset.protected_attributes)):  # 3,5
             protect_feature = dataset.protected_attributes[sample_index]
             this_sample_protect_level = 0
             for group in self.privileged_groups:
@@ -236,21 +246,21 @@ class MultiLevelReweighing(Transformer):
                 level = group["level"]
                 index = dataset.protected_attribute_names.index(name)
                 if protect_feature[index] == val:
-                    this_sample_protect_level = this_sample_protect_level + level# 3
+                    this_sample_protect_level = this_sample_protect_level + level  # 3
             protect_level_dic[
                 "protect_level" + str(this_sample_protect_level) + "_cond"
             ][sample_index] = True
             # "protect_level" + str(3) + "_cond":[0,0,0,1,0]
-        
-        #[[1],[0],[1]],[1,0,1]
-        fav_cond = (dataset.labels.ravel() == dataset.favorable_label) #[0,0,1,1,0]
-        unfav_cond = (dataset.labels.ravel() == dataset.unfavorable_label)#[1,1,0,0,1]
+
+        # [[1],[0],[1]],[1,0,1]
+        fav_cond = dataset.labels.ravel() == dataset.favorable_label  # [0,0,1,1,0]
+        unfav_cond = dataset.labels.ravel() == dataset.unfavorable_label  # [1,1,0,0,1]
 
         # combination of label and privileged/unpriv. groups
         combination_p_fav_dic = {}
-        #"cond_p3_fav":[0,0,1,0,0]
+        # "cond_p3_fav":[0,0,1,0,0]
 
-        for i in range(0, level_max + 1):#3
+        for i in range(0, level_max + 1):  # 3
 
             combination_p_fav_dic["cond_p" + str(i) + "_fav"] = np.logical_and(
                 fav_cond, protect_level_dic["protect_level" + str(i) + "_cond"]

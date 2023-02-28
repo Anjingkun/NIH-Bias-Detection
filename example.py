@@ -1,11 +1,17 @@
+"""
+Part 01: `measure_disparity.py` usage
+"""
+
+
+import numpy as np
 from aif360.algorithms.preprocessing.optim_preproc_helpers.data_preproc_functions import (
     load_preproc_data_adult,
 )
-from sklearn.pipeline import make_pipeline
-from measure_disparity import measure_disparity
-from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-import numpy as np
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
+from measure_disparity import measure_disparity
 
 privileged_groups = [{"sex": 1}]
 unprivileged_groups = [{"sex": 0}]
@@ -42,39 +48,56 @@ data_dic = {
 dataframe = pd.DataFrame(data_dic)
 measure_disparity(dataframe)
 
+"""
+Part 02: `mitigate_disparity.py` usage
+"""
+
 
 from aif360.datasets import AdultDataset
-from mitigate_disparity import MultiLevelReweighing  as Reweighing , BiasRemoverModel
 from aif360.metrics import BinaryLabelDatasetMetric
+
+from mitigate_disparity import BiasRemoverModel
+from mitigate_disparity import MultiLevelReweighing as Reweighing
+
 adult_dataset = AdultDataset()
-print(adult_dataset.labels.ravel()==1)
-multi_privileged_groups = [{'feature_name':'race','privileged_value':1,'level':1},{'feature_name':'sex','privileged_value':1,'level':1}]
-multi_unprivileged_groups = [{'feature_name':'race','unprivileged_value':0,'level':1},{'feature_name':'sex','unprivileged_value':0,'level':1}]
-rw = Reweighing(multi_unprivileged_groups,multi_privileged_groups)
+print(adult_dataset.labels.ravel() == 1)
+multi_privileged_groups = [
+    {"feature_name": "race", "privileged_value": 1, "level": 1},
+    {"feature_name": "sex", "privileged_value": 1, "level": 1},
+]
+multi_unprivileged_groups = [
+    {"feature_name": "race", "unprivileged_value": 0, "level": 1},
+    {"feature_name": "sex", "unprivileged_value": 0, "level": 1},
+]
+rw = Reweighing(multi_unprivileged_groups, multi_privileged_groups)
 trans_adult_dataset = rw.fit_transform(adult_dataset)
-privileged_groups1 = [{'sex':1}]
-unprivileged_groups1 = [{'sex':0}]
-privileged_groups2 =[{'race':1}]
-unprivileged_groups2 = [{'race':0}]
+privileged_groups1 = [{"sex": 1}]
+unprivileged_groups1 = [{"sex": 0}]
+privileged_groups2 = [{"race": 1}]
+unprivileged_groups2 = [{"race": 0}]
 metric_orig_adult = BinaryLabelDatasetMetric(
-        adult_dataset,
-        unprivileged_groups=unprivileged_groups1,
-        privileged_groups=privileged_groups1)
+    adult_dataset,
+    unprivileged_groups=unprivileged_groups1,
+    privileged_groups=privileged_groups1,
+)
 print(metric_orig_adult.disparate_impact())
 metric_trans_adult = BinaryLabelDatasetMetric(
-        trans_adult_dataset,
-        unprivileged_groups=unprivileged_groups1,
-        privileged_groups=privileged_groups1)
+    trans_adult_dataset,
+    unprivileged_groups=unprivileged_groups1,
+    privileged_groups=privileged_groups1,
+)
 print(metric_trans_adult.disparate_impact())
 metric_orig_adult = BinaryLabelDatasetMetric(
-        adult_dataset,
-        unprivileged_groups=unprivileged_groups2,
-        privileged_groups=privileged_groups2)
+    adult_dataset,
+    unprivileged_groups=unprivileged_groups2,
+    privileged_groups=privileged_groups2,
+)
 print(metric_orig_adult.disparate_impact())
 metric_trans_adult = BinaryLabelDatasetMetric(
-        trans_adult_dataset,
-        unprivileged_groups=unprivileged_groups2,
-        privileged_groups=privileged_groups2)
+    trans_adult_dataset,
+    unprivileged_groups=unprivileged_groups2,
+    privileged_groups=privileged_groups2,
+)
 print(metric_trans_adult.disparate_impact())
 brm_model = BiasRemoverModel()
 brm_model.fit(adult_dataset)
