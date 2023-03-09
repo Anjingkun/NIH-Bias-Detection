@@ -1,12 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Explainers
-from aif360.explainers import MetricTextExplainer
 
-# Fairness metrics
-from aif360.metrics import BinaryLabelDatasetMetric, ClassificationMetric
-from pandas import DataFrame
 
 
 class data:

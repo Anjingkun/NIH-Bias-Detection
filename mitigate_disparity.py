@@ -1,13 +1,11 @@
 # Scalers
-import numpy as np
-from aif360.algorithms import Transformer
-from aif360.metrics import utils
+from sklearn.preprocessing import StandardScaler
 
 # Classifiers
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+import numpy as np
 
 
 class BiasRemoverModel:
@@ -38,7 +36,7 @@ class BiasRemoverModel:
                 {
                     "feature_name": dataset.protected_attribute_names[i],
                     "privileged_value": dataset.privileged_protected_attributes[i][0],
-                    "level": 1,  # we can change this level，but this level must be positive integar
+                    "level": 1,  # we can change this level
                 }
             )
             unprivileged_groups.append(
@@ -47,11 +45,11 @@ class BiasRemoverModel:
                     "unprivileged_value": dataset.unprivileged_protected_attributes[i][
                         0
                     ],
-                    "level": 1,  # we can change this level，but this level must be positive integar
+                    "level": 1,  # we can change this level
                 }
             )
         rw = MultiLevelReweighing(unprivileged_groups, privileged_groups)
-        trans_dataset = rw.fit_transform(dataset)
+        trans_dataset = rw.fit(dataset).transform(dataset)
         fit_params = {
             "logisticregression__sample_weight": trans_dataset.instance_weights
         }
@@ -77,7 +75,7 @@ class BiasRemoverModel:
         return self.lr_model.predict_proba(features)
 
 
-class MultiLevelReweighing(Transformer):
+class MultiLevelReweighing:
     """MultiLevelReweighing is a preprocessing technique that Weights the examples in each
     (group, label) combination differently to ensure fairness before
     classification .This technique can compute the protected level of every sample , and then it can
@@ -93,9 +91,6 @@ class MultiLevelReweighing(Transformer):
             [{'feature_name':'sex','privileged_value':1,'level':2},
             {'feature_name':'race','privileged_value':1,'level':1}]
         """
-        super(MultiLevelReweighing, self).__init__(
-            unprivileged_groups=unprivileged_groups, privileged_groups=privileged_groups
-        )
 
         self.unprivileged_groups = unprivileged_groups
         self.privileged_groups = privileged_groups
