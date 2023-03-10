@@ -2,8 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-
-
 class data:
     """
     This class can become the object of every sample.

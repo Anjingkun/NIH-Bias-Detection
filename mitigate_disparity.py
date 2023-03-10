@@ -1,11 +1,11 @@
 # Scalers
-from sklearn.preprocessing import StandardScaler
+import numpy as np
 
 # Classifiers
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
-import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 
 class BiasRemoverModel:
