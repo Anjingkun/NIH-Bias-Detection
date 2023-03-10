@@ -26,4 +26,28 @@ conda activate befair
 pip install -r requirements.txt
 ```
 
-Please make sure you have correctly installed aif360 package. If not, please install it manually. (AIF360 GitHub repository reference: https://github.com/Trusted-AI/AIF360)
+Please follow the instructions in `datasets/README.md` to download the datasets. An easier way is to download from GitHub Releases and put them in `datasets/data/raw` folder
+
+Folder structure:
+
+```bash
+datasets/
+  ├── data/
+  │   └── raw/
+  │       ├── adult/
+  │       │   ├── adult.data
+  │       │   ├── adult.names
+  │       │   ├── adult.test
+  │       │   └── README.md
+  │       ├── meps/
+  │       │   ├── h181.csv
+  │       │   ├── h192.csv
+  │       │   ├── generate_data.R
+  │       │   └── README.md
+  │       └── ...
+  └── utils/
+measure_disparity.py
+mitigate_disparity.py
+example_adult.ipynb
+example_meps.ipynb
+```

@@ -1,7 +1,26 @@
 # Datasets
 
-The datasets are located in `datasets/raw` folder. Please follow the instructions given for each dataset in its corresponding README file to download the datasets, or simply download them from BeFair Releases.
+The datasets are located in `datasets/data/raw` folder. Please follow the instructions given for each dataset in its corresponding README file to download the datasets, or simply download them from BeFair Releases.
 
+Folder structure:
+
+```bash
+datasets/
+  ├── data/
+  │   └── raw/
+  │       ├── adult/
+  │       │   ├── adult.data
+  │       │   ├── adult.names
+  │       │   ├── adult.test
+  │       │   └── README.md
+  │       ├── meps/
+  │       │   ├── h181.csv
+  │       │   ├── h192.csv
+  │       │   ├── generate_data.R
+  │       │   └── README.md
+  │       └── ...
+  └── utils/
+```
 
 1. Adult / Census Income 
 
