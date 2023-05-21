@@ -26,6 +26,8 @@ conda activate befair
 pip install -r requirements.txt
 ```
 
+Or pull the docker image from link: https://hub.docker.com/r/tualatinx/befair
+
 Please follow the instructions in `datasets/README.md` to download the datasets. An easier way is to download from GitHub Releases and put them in `datasets/data/raw` folder
 
 Folder structure:
